@@ -57,7 +57,7 @@ fn day01() {
 fn day02() {
     let reader = BufReader::new(File::open("inputs/input02.txt").expect("Cannot open file"));
     enum Dir {
-        Forward, Backward, Up, Down
+        Forward, Up, Down
     }
     let mut inputs = Vec::<(Dir, i32)>::with_capacity(100);
     for line in reader.lines() {
@@ -65,7 +65,6 @@ fn day02() {
         let (dir_str, dist_str) = saved_line.split_once(" ").unwrap();
         let dir = match dir_str.chars().next().unwrap() {
             'f' => Dir::Forward,
-            'b' => Dir::Backward,
             'u' => Dir::Up,
             'd' => Dir::Down,
             _ => panic!("Bad direction"),
@@ -79,7 +78,6 @@ fn day02() {
     for (dir, dist) in &inputs {
         match dir {
             Dir::Forward => x += dist,
-            Dir::Backward => x -= dist,
             Dir::Up => depth -= dist,
             Dir::Down => depth += dist,
         }
@@ -94,7 +92,6 @@ fn day02() {
     for (dir, dist) in inputs {
         match dir {
             Dir::Forward => { x += dist; depth += dist * aim; }
-            Dir::Backward => { x += dist; depth -= dist * aim; }
             Dir::Up => aim -= dist,
             Dir::Down => aim += dist,
         }
