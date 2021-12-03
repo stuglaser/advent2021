@@ -123,9 +123,9 @@ impl<T> Index<(usize, usize)> for Grid<T> {
 
 fn day03() {
     const INPUT: &str = "inputs/input03.txt";
+    let input_str = std::fs::read_to_string(INPUT).unwrap();
 
     // Constructs the grid manually so we can stream it in.
-     let input_str = std::fs::read_to_string(INPUT).unwrap();
     let mut grid_data = Vec::<u8>::with_capacity(1001 * 12);
     let mut grid_rows = 0;
     for ch in input_str.bytes() {
@@ -136,6 +136,16 @@ fn day03() {
             _ => unreachable!(),
         }
     }
+
+    // Slower, unfortunately. Probably because our capacity guess is better than collect's
+    // let grid_data: Vec<u8> = input_str.bytes()
+    //     .filter_map(|b| match b {
+    //         b'0' => Some(0),
+    //         b'1' => Some(1),
+    //         b'\n' => { grid_rows += 1; None},
+    //         _ => unreachable!(),
+    //     }).collect();
+
     let grid = Grid::<u8>{rows: grid_rows, cols: grid_data.len() / grid_rows, data: grid_data};
 
 
