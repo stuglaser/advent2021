@@ -1,6 +1,5 @@
-use std::cmp::max;
 use std::io::{BufReader, BufRead};
-use std::fs::{File, self};
+use std::fs::File;
 use std::ops::Index;
 use std::time::Instant;
 
@@ -123,19 +122,22 @@ impl<T> Index<(usize, usize)> for Grid<T> {
 }
 
 fn day03() {
-    let INPUT = "inputs/input03.txt";
+    const INPUT: &str = "inputs/input03.txt";
 
     // Constructs the grid manually so we can stream it in.
-    let reader = BufReader::new(File::open(INPUT).expect("Cannot open file"));
+     let input_str = std::fs::read_to_string(INPUT).unwrap();
     let mut grid_data = Vec::<u8>::with_capacity(1001 * 12);
     let mut grid_rows = 0;
-    for line in reader.lines() {
-        for ch in line.unwrap().chars() {
-            grid_data.push((ch as u8) - b'0');
+    for ch in input_str.bytes() {
+        match ch {
+            b'0' => grid_data.push(0),
+            b'1' => grid_data.push(1),
+            b'\n' => grid_rows += 1,
+            _ => unreachable!(),
         }
-        grid_rows += 1;
     }
     let grid = Grid::<u8>{rows: grid_rows, cols: grid_data.len() / grid_rows, data: grid_data};
+
 
     let mut cnt_ones = vec![0; grid.cols];
     for row in 0..grid.rows {
