@@ -1,4 +1,4 @@
-use std::ops::Index;
+use std::ops::{Index, IndexMut};
 
 pub struct Grid<T> {
     pub rows: usize,
@@ -16,5 +16,10 @@ impl<T> Index<(usize, usize)> for Grid<T> {
     fn index(&self, rowcol: (usize, usize)) -> &Self::Output {
         &self.data[rowcol.0 * self.cols + rowcol.1]
     }
+}
 
+impl<T> IndexMut<(usize, usize)> for Grid<T> {
+    fn index_mut(&mut self, rowcol: (usize, usize)) -> &mut Self::Output {
+        &mut self.data[rowcol.0 * self.cols + rowcol.1]
+    }
 }
