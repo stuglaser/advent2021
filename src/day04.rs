@@ -1,4 +1,5 @@
-use std::collections::HashMap;
+//use std::collections::HashMap;
+use rustc_hash::FxHashMap;
 
 use crate::utils::*;
 
@@ -13,7 +14,7 @@ pub fn day04() {
         .map(|s| s.parse::<i32>().unwrap()).collect();
 
     // Parses the boards
-    let mut board_lookup = HashMap::<i32, Vec<(usize, usize, usize)>>::new();
+    let mut board_lookup = FxHashMap::<i32, Vec<(usize, usize, usize)>>::default();
 
     let mut board_sums = Vec::<usize>::with_capacity(20);
     for (b, board_str) in parts.enumerate() {
@@ -23,8 +24,8 @@ pub fn day04() {
                 let num = num_str.parse::<i32>().unwrap();
                 board_sum += num as usize;
                 board_lookup.entry(num)
-                    .and_modify(|e| e.push((b, r, c)))
-                    .or_insert(vec![(b, r, c)]);
+                    .or_insert(Vec::with_capacity(8))
+                    .push((b, r, c));
             }
         }
         board_sums.push(board_sum);
