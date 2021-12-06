@@ -9,12 +9,11 @@ pub fn day06() {
     let input_str = input_str.trim_end();
     //let input_str = "3,4,3,1,2";
 
-    let start: Vec<usize> = input_str.split(',').map(|s| s.parse::<usize>().unwrap()).collect();
-
     let mut current = vec![0usize; 9];
-    for n in start {
-        current[n] += 1;
+    for num_str in input_str.split(",") {
+        current[num_str.parse::<usize>().unwrap()] += 1;
     }
+    
     let mut part1 = 0;
     for d in 1..=256 {
         let mut next = vec![0usize; 9];
