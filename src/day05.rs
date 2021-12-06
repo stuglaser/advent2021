@@ -1,5 +1,3 @@
-use std::cmp::{max, min};
-
 use regex::Regex;
 //use std::collections::HashMap;
 use rustc_hash::FxHashMap;
@@ -43,18 +41,13 @@ impl Iterator for AlongIterator {
 }
 fn iter_along(a: i32, b: i32) -> AlongIterator {
     AlongIterator{next: a, end: b, step: (b - a).signum()}
-    // if a <= b {
-    //     a..=b
-    // } else {
-    //     (b..=a).rev()
-    // }
 }
 
 pub fn day05() {
     const INPUT: &str = "inputs/input05.txt";
     let input_str = std::fs::read_to_string(INPUT).unwrap();
 
-    let re_parse_line = Regex::new(r"(\d+),(\d+) -> (\d+),(\d+)").unwrap();
+    let re_parse_line = Regex::new(r"(\d+),(\d+) -> (\d+),(\d+)\n").unwrap();
 
     let mut lines = Vec::<Line>::with_capacity(1000);
     for cap in re_parse_line.captures_iter(&input_str) {
@@ -68,6 +61,8 @@ pub fn day05() {
 
     let mut horvert_locs = FxHashMap::<(i32, i32), i32>::default();
     let mut locs = FxHashMap::<(i32, i32), i32>::default();
+    locs.reserve(100000);
+    horvert_locs.reserve(100000);
     for line in lines {
         if line.x0 == line.x1 {
             for y in iter_along(line.y0, line.y1) {
@@ -86,10 +81,11 @@ pub fn day05() {
         }
     }
 
+    //println!("Hash size: {}", locs.len());
     let part1 = horvert_locs.into_values().filter(|cnt| *cnt > 1).count();
     let part2 = locs.into_values().filter(|cnt| *cnt > 1).count();
-    println!("Part 1: {}", part1);
-    //assert_eq!(part1, 8111);
-    println!("Part 2: {}", part2);
+    //println!("Part 1: {}", part1);
+    assert_eq!(part1, 8111);
+    //println!("Part 2: {}", part2);
     assert_eq!(part2, 22088);
 }
