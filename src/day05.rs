@@ -2,8 +2,6 @@ use regex::Regex;
 //use std::collections::HashMap;
 use rustc_hash::FxHashMap;
 
-use crate::utils::*;
-
 #[derive(Debug)]
 struct Line {
     x0: i32,

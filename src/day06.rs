@@ -1,8 +1,3 @@
-//use std::collections::HashMap;
-use rustc_hash::FxHashMap;
-
-use crate::utils::*;
-
 pub fn day06() {
     const INPUT: &str = "inputs/input06.txt";
     let input_str = std::fs::read_to_string(INPUT).unwrap();
