@@ -2,7 +2,7 @@ use std::io::{BufRead, BufReader};
 use std::fs::File;
 
 
-pub fn day01() {
+pub fn day01(_test_mode: bool) {
     let reader = BufReader::new(File::open("inputs/input01.txt").expect("Cannot open file"));
     let mut inputs = Vec::<i32>::with_capacity(100);
     for line in reader.lines() {

@@ -41,7 +41,7 @@ fn iter_along(a: i32, b: i32) -> AlongIterator {
     AlongIterator{next: a, end: b, step: (b - a).signum()}
 }
 
-pub fn day05() {
+pub fn day05(_test_mode: bool) {
     const INPUT: &str = "inputs/input05.txt";
     let input_str = std::fs::read_to_string(INPUT).unwrap();
 

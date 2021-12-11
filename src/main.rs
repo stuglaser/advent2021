@@ -12,6 +12,8 @@ struct Opts {
     atleast: Option<f32>,
     #[clap(long)]
     per: bool,
+    #[clap(short, long)]
+    test: bool,
 }
 
 mod utils;
@@ -40,7 +42,7 @@ mod day10;
 // mod day23;
 // mod day24;
 // mod day25;
-static DAYS: &'static [fn()] = &[
+static DAYS: &'static [fn(bool)] = &[
     day01::day01,
     day02::day02,
     day03::day03,
@@ -85,7 +87,7 @@ fn main() {
             let started = Instant::now();
             let mut samples = 0;
             while started.elapsed().as_secs_f32() < atleast {
-                DAYS[i]();
+                DAYS[i](opts.test);
                 samples += 1;
             }
             let elapsed = started.elapsed();
@@ -97,11 +99,11 @@ fn main() {
         // Running one day or everything?
         let runner: Box<dyn Fn()> = match opts.day {
             Some(day) => Box::new(move || {
-                DAYS[day as usize - 1]();
+                DAYS[day as usize - 1](opts.test);
             }),
             None => Box::new(|| {
                 for run_day in DAYS {
-                    run_day();
+                    run_day(opts.test);
                 }
             })
         };

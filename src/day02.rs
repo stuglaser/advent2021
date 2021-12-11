@@ -2,7 +2,7 @@ use std::io::{BufRead, BufReader};
 use std::fs::File;
 
 
-pub fn day02() {
+pub fn day02(_test_mode: bool) {
     let reader = BufReader::new(File::open("inputs/input02.txt").expect("Cannot open file"));
     enum Dir {
         Forward, Up, Down

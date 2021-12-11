@@ -1,7 +1,7 @@
 use crate::utils::*;
 
 
-pub fn day03() {
+pub fn day03(_test_mode: bool) {
     const INPUT: &str = "inputs/input03.txt";
     let input_str = std::fs::read_to_string(INPUT).unwrap();
 

@@ -4,7 +4,7 @@ use rustc_hash::FxHashMap;
 use crate::utils::*;
 
 
-pub fn day04() {
+pub fn day04(_test_mode: bool) {
     const INPUT: &str = "inputs/input04.txt";
     let input_str = std::fs::read_to_string(INPUT).unwrap();
 

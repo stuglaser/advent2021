@@ -13,16 +13,18 @@ fn lookup_canonical_and_collapse(collapsing: &mut [i32], idx: i32) -> i32 {
     }
 }
 
-pub fn day09() {
+pub fn day09(test_mode: bool) {
     const INPUT: &str = "inputs/input09.txt";
-    let input_str = std::fs::read_to_string(INPUT).unwrap();
-    let input_str = input_str.trim_end();
-
-    // let input_str = "2199943210
-    // 3987894921
-    // 9856789892
-    // 8767896789
-    // 9899965678";
+    let file_str = std::fs::read_to_string(INPUT).unwrap();
+    let input_str = if test_mode {
+        "2199943210
+3987894921
+9856789892
+8767896789
+9899965678"
+    } else {
+        file_str.trim_end()
+    };
     
     let mut grid_data = Vec::<u8>::with_capacity(50 * 50);
     let mut grid_rows = 0usize;
@@ -54,7 +56,7 @@ pub fn day09() {
         }
     }
     // println!("Part 1: {}", part1);
-    assert_eq!(part1, 548);
+    assert_eq!(part1, if test_mode { 15 } else { 548 });
 
     // Really 9's are just the boundaries, and every other value is the same.
 
@@ -108,5 +110,5 @@ pub fn day09() {
     }
     let part2 = top3[1] * top3[2] * top3[3];
     // println!("Part 2: {}", part2);
-    assert_eq!(part2, 786048);
+    assert_eq!(part2, if test_mode { 1134 } else { 786048 });
 }

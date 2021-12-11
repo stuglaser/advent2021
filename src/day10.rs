@@ -32,21 +32,23 @@ fn incomplete_score_of(ch: u8) -> usize {
     }
 }
 
-pub fn day10() {
+pub fn day10(test_mode: bool) {
     const INPUT: &str = "inputs/input10.txt";
-    let input_str = std::fs::read_to_string(INPUT).unwrap();
-    let input_str = input_str.trim_end();
-
-//     let input_str = "[({(<(())[]>[[{[]{<()<>>
-// [(()[<>])]({[<{<<[]>>(
-// {([(<{}[<>[]}>{[]{[(<()>
-// (((({<>}<{<{<>}{[]{[]{}
-// [[<[([]))<([[{}[[()]]]
-// [{[{({}]{}}([{[{{{}}([]
-// {<[[]]>}<{[{[{[]{()[[[]
-// [<(<(<(<{}))><([]([]()
-// <{([([[(<>()){}]>(<<{{
-// <{([{{}}[<[[[<>{}]]]>[]]";
+    let file_str = std::fs::read_to_string(INPUT).unwrap();
+    let input_str = if test_mode {
+        "[({(<(())[]>[[{[]{<()<>>
+[(()[<>])]({[<{<<[]>>(
+{([(<{}[<>[]}>{[]{[(<()>
+(((({<>}<{<{<>}{[]{[]{}
+[[<[([]))<([[{}[[()]]]
+[{[{({}]{}}([{[{{{}}([]
+{<[[]]>}<{[{[{[]{()[[[]
+[<(<(<(<{}))><([]([]()
+<{([([[(<>()){}]>(<<{{
+<{([{{}}[<[[[<>{}]]]>[]]"
+    } else {
+        file_str.trim_end()
+    };
 
     let mut part1 = 0;
     let mut incomplete_scores = Vec::<usize>::with_capacity(100);
@@ -74,10 +76,10 @@ pub fn day10() {
     }
 
     // println!("Part 1: {}", part1);
-    assert_eq!(part1, 265527);
+    assert_eq!(part1, if test_mode { 26397 } else { 265527 });
 
     incomplete_scores.sort();
     let part2 = incomplete_scores[incomplete_scores.len() / 2];
     // println!("Part 2: {}", part2);
-    assert_eq!(part2, 3969823589);
+    assert_eq!(part2, if test_mode { 288957 } else { 3969823589 });
 }
