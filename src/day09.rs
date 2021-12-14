@@ -23,7 +23,7 @@ pub fn day09(test_mode: bool) {
 8767896789
 9899965678"
     } else {
-        file_str.trim_end()
+        &file_str
     };
     
     let mut grid_data = Vec::<u8>::with_capacity(50 * 50);

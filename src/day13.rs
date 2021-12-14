@@ -33,7 +33,7 @@ pub fn day13(test_mode: bool) {
 fold along y=7
 fold along x=5"
     } else {
-        file_str.trim_end()
+        &file_str
     };
 
     let mut dots = Vec::<Pt>::with_capacity(1000);

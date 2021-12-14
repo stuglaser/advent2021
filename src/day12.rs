@@ -59,7 +59,7 @@ zg-he
 pj-fs
 start-RW"
     } else {
-        file_str.trim_end()
+        &file_str
     };
 
     // let mut edges = FxHashMap::<String, String>::default();

@@ -6,7 +6,6 @@ pub fn day06(test_mode: bool) {
     } else {
         file_str.trim_end()
     };
-    //let input_str = "3,4,3,1,2";
 
     let mut current = vec![0usize; 9];
     for num_str in input_str.split(",") {

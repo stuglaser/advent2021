@@ -55,7 +55,7 @@ pub fn day11(test_mode: bool) {
 4846848554
 5283751526"
     } else {
-        file_str.trim_end()
+        &file_str
     };
 
     let mut grid_data = Vec::<u8>::with_capacity(10 * 10);

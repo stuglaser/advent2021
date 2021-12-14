@@ -47,7 +47,7 @@ pub fn day10(test_mode: bool) {
 <{([([[(<>()){}]>(<<{{
 <{([{{}}[<[[[<>{}]]]>[]]"
     } else {
-        file_str.trim_end()
+        &file_str
     };
 
     let mut part1 = 0;

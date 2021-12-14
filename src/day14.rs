@@ -23,9 +23,6 @@ fn solve_from_pairs(initial: &str, pairs: &FxHashMap<String, usize>) -> usize {
     }
     let last_letter = initial.bytes().last().unwrap() - b'A';
     counts[last_letter as usize] += 1;
-    // let lo_cnt = counts.iter().filter(|x| **x > 0).min().unwrap();
-    // let hi_cnt = counts.iter().max().unwrap();
-    // hi_cnt - lo_cnt
     let (lo, hi) = minmax(counts.iter().filter(|x| **x > 0)).unwrap();
     hi - lo
 }
@@ -53,7 +50,7 @@ BC -> B
 CC -> N
 CN -> C"
     } else {
-        file_str.trim_end()
+        &file_str
     };
 
     let mut initial = String::new();
