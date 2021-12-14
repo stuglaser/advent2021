@@ -12,3 +12,5 @@ regex = "1"
 
 [profile.release]
 debug = true
+#lto = "thin"
+incremental = true

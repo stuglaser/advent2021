@@ -1,5 +1,21 @@
 use rustc_hash::FxHashMap;
 
+pub fn minmax<I>(mut iterable: I) -> Option<(I::Item, I::Item)>
+where
+    I: Sized,
+    I: Iterator,
+    I::Item: Ord,
+    I::Item: Clone,
+{
+
+    let first_item = iterable.next()?;
+    Some(iterable.fold((first_item.clone(), first_item),
+        |pair, item|
+            (if item < pair.0 { item.clone() } else { pair.0 },
+             if item > pair.1 { item } else { pair.1 })
+    ))
+}
+
 fn solve_from_pairs(initial: &str, pairs: &FxHashMap<String, usize>) -> usize {
     let mut counts = vec![0usize; 26];
     for (pair, cnt) in pairs {
@@ -7,9 +23,11 @@ fn solve_from_pairs(initial: &str, pairs: &FxHashMap<String, usize>) -> usize {
     }
     let last_letter = initial.bytes().last().unwrap() - b'A';
     counts[last_letter as usize] += 1;
-    let lo_cnt = counts.iter().filter(|x| **x > 0).min().unwrap();
-    let hi_cnt = counts.iter().max().unwrap();
-    hi_cnt - lo_cnt
+    // let lo_cnt = counts.iter().filter(|x| **x > 0).min().unwrap();
+    // let hi_cnt = counts.iter().max().unwrap();
+    // hi_cnt - lo_cnt
+    let (lo, hi) = minmax(counts.iter().filter(|x| **x > 0)).unwrap();
+    hi - lo
 }
 
 pub fn day14(test_mode: bool) {
