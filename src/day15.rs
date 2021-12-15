@@ -20,69 +20,71 @@ pub fn parse_digit_grid(string: &str) -> Grid<u8> {
     Grid{rows: grid_rows, cols: grid_cols, data: grid_data}
 }
 
-impl Ord for Pt {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        if self.x == other.x {
-            if self.y == other.y {
-                std::cmp::Ordering::Equal
-            } else if self.y < other.y {
-                std::cmp::Ordering::Less
-            } else {
-                std::cmp::Ordering::Greater
-            }
-        } else if self.x < other.x {
-            std::cmp::Ordering::Less
-        } else {
-            std::cmp::Ordering::Greater
-        }
+
+// Ordering by the first element of a tuple (in reverse)
+#[repr(transparent)]
+#[derive(Debug)]
+pub struct ByFirstRev<T>(pub T);
+
+impl<A: PartialEq, B> PartialEq for ByFirstRev<(A, B)> {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.0 == other.0.0
+    }
+}
+impl<A: Eq, B> Eq for ByFirstRev<(A, B)> {}
+
+impl<A: PartialOrd, B> PartialOrd for ByFirstRev<(A, B)> {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        other.0.0.partial_cmp(&self.0.0)
     }
 }
 
-impl PartialOrd for Pt {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
+impl<A: Ord, B> Ord for ByFirstRev<(A, B)> {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        other.0.0.cmp(&self.0.0)
     }
 }
+
 
 fn find_min_risk(grid: &Grid<u8>) -> usize {
     let mut visited = Grid{rows: grid.rows, cols: grid.cols, data: vec![false; grid.data.len()]};
 
     let mut heap = BinaryHeap::with_capacity(grid.rows + grid.cols);
-    heap.push( (0i32, Pt{x: 0, y: 0}));
+    heap.push( ByFirstRev((0i32, Pt{x: 0, y: 0})));
     loop {
-        let (score, at) = heap.pop().unwrap();
+        let ByFirstRev((score, at)) = heap.pop().unwrap();
 
         if visited[&at] { continue; }
         visited[&at] = true;
 
         if (at.x as usize) == grid.cols - 1 && (at.y as usize) == grid.rows - 1 {
             // FINISHED
-            return (-score) as usize;
+            return score as usize;
         }
 
         // Walks the neighbors
         if at.x > 0 {
             let n = Pt{x: at.x - 1, y: at.y};
             if !visited[&n] {
-                heap.push((score - grid[&n] as i32, n));
+                heap.push(ByFirstRev((score + grid[&n] as i32, n)));
             }
         }
         if at.y > 0 {
             let n = Pt{x: at.x, y: at.y - 1};
             if !visited[&n] {
-                heap.push((score - grid[&n] as i32, n));
+                heap.push(ByFirstRev((score + grid[&n] as i32, n)));
             }
         }
         if (at.x as usize) < grid.cols - 1 {
             let n = Pt{x: at.x + 1, y: at.y};
             if !visited[&n] {
-                heap.push((score - grid[&n] as i32, n));
+                heap.push(ByFirstRev((score + grid[&n] as i32, n)));
             }
         }
         if (at.y as usize) < grid.rows - 1 {
             let n = Pt{x: at.x, y: at.y + 1};
             if !visited[&n] {
-                heap.push((score - grid[&n] as i32, n));
+                heap.push(ByFirstRev((score + grid[&n] as i32, n)));
             }
         }
     }
