@@ -1,11 +1,7 @@
+use crate::utils::*;
 
 use rustc_hash::FxHashSet;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-struct Pt {
-    x: i32,
-    y: i32,
-}
 
 pub fn day13(test_mode: bool) {
     const INPUT: &str = "inputs/input13.txt";

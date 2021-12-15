@@ -31,7 +31,7 @@ mod day11;
 mod day12;
 mod day13;
 mod day14;
-// mod day15;
+mod day15;
 // mod day16;
 // mod day17;
 // mod day18;
@@ -57,7 +57,7 @@ static DAYS: &'static [fn(bool)] = &[
     day12::day12,
     day13::day13,
     day14::day14,
-    // day15::day15,
+    day15::day15,
     // day16::day16,
     // day17::day17,
     // day18::day18,
@@ -92,7 +92,7 @@ fn main() {
             }
             let elapsed = started.elapsed();
             total += (elapsed / samples).as_secs_f64();
-            println!("Day {:2} | {:?}  ({} samples)", i + 1, elapsed / samples, samples);
+            println!("Day {:2} | {:7} µs  ({} samples)", i + 1, (elapsed / samples).as_micros(), samples);
         }
         println!("Theoretical total: {} ms", total * 1000.0);
     } else {  // Benchmarks the total
