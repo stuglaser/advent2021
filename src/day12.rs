@@ -1,35 +1,34 @@
+use rustc_hash::FxHashMap;
 
-use rustc_hash::{FxHashMap, FxHashSet};
+type Graph = Vec<Vec<usize>>;
 
-type Graph = FxHashMap<String, Vec<String>>;
-
-fn count_paths<'a>(edges: &'a Graph, seen: &mut FxHashSet<&'a str>, at: &'a str, small_repeats_left: usize) -> usize {
-    if at == "end" {
+fn count_paths(edges: &Graph, is_small: &[bool], seen: &mut [bool], at: usize, small_repeats_left: usize) -> usize {
+    if at == 1 {  // The end
         return 1;
     }
 
-    let is_lowercase = at.as_bytes().first().unwrap() >= &b'a';
+    let is_lowercase = is_small[at];
 
-    let is_repeat = is_lowercase && seen.contains(&at);
+    let is_repeat = is_lowercase && seen[at];
     let mut small_repeats_left = small_repeats_left;
     if is_repeat {
-        if at == "start" || small_repeats_left == 0 {
+        if at == 0 || small_repeats_left == 0 {
             return 0;
         }
         small_repeats_left -= 1;
     }
 
     if is_lowercase && !is_repeat {
-        seen.insert(at);
+        seen[at] = true;
     }
 
     let mut paths = 0;
     for next in &edges[at] {
-        paths += count_paths(edges, seen, next, small_repeats_left);
+        paths += count_paths(edges, is_small, seen, *next, small_repeats_left);
     }
 
     if is_lowercase && !is_repeat {
-        seen.remove(at);
+        seen[at] = false;
     }
 
     paths
@@ -62,21 +61,39 @@ start-RW"
         &file_str
     };
 
-    // let mut edges = FxHashMap::<String, String>::default();
-    let mut edges = Graph::default();
+    let mut node_lookup = FxHashMap::<String, usize>::with_capacity_and_hasher(100, Default::default());
+    node_lookup.insert("start".to_string(), 0);
+    node_lookup.insert("end".to_string(), 1);
+
+    let mut edges = Vec::<Vec<usize>>::with_capacity(100);
+    edges.resize(2, Vec::with_capacity(8));
 
     for line in input_str.lines() {
         let mut it = line.split("-");
         let a = it.next().unwrap();
         let b = it.next().unwrap();
 
-        edges.entry(a.to_string()).or_insert(Vec::with_capacity(8)).push(b.to_string());
-        edges.entry(b.to_string()).or_insert(Vec::with_capacity(8)).push(a.to_string());
+        let a_id = *node_lookup.entry(a.to_string()).or_insert_with(|| {
+            edges.resize(edges.len() + 1, Vec::with_capacity(8));
+            edges.len() - 1
+        });
+        let b_id = *node_lookup.entry(b.to_string()).or_insert_with(|| {
+            edges.resize(edges.len() + 1, Vec::with_capacity(8));
+            edges.len() - 1
+        });
+
+        edges[a_id].push(b_id);
+        edges[b_id].push(a_id);
     }
 
-    let mut seen = FxHashSet::<&str>::default();
-    let part1 = count_paths(&edges, &mut seen, "start", 0);
-    let part2 = count_paths(&edges, &mut seen, "start", 1);
+    let mut is_small = vec![false; edges.len()];
+    for (k, v) in node_lookup {
+        is_small[v] = k.as_bytes().first().unwrap() >= &b'a';
+    }
+
+    let mut seen = vec![false; edges.len()];
+    let part1 = count_paths(&edges, &is_small, &mut seen, 0, 0);
+    let part2 = count_paths(&edges, &is_small, &mut seen, 0, 1);
 
     // println!("Part 1: {}", part1);
     assert_eq!(part1, if test_mode { 226 } else { 3369 });
