@@ -6,6 +6,12 @@ pub struct Pt {
     pub y: i32,
 }
 
+impl Pt {
+    pub fn at(x: i32, y: i32) -> Pt {
+        Pt{x, y}
+    }
+}
+
 
 pub struct Grid<T> {
     pub rows: usize,
