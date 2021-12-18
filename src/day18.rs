@@ -76,132 +76,117 @@ fn add_rightmost(piece: &mut Piece, value: i32) {
     }
 }
 
-struct PieceExplosion {
-    changed: bool,
-    piece: Piece,
+struct Explosion {
+    immediate: bool,
     num_left: i32,
     num_right: i32,
 }
 
-struct SnailExplosion {
-    changed: bool,
-    snail: SnailNum,
-    num_left: i32,
-    num_right: i32,
-}
-
-impl SnailExplosion {
-    fn unchanged(left: Piece, right: Piece) -> SnailExplosion {
-        Self{
-            changed: false,
-            snail: Box::new((left, right)),
-            num_left: 0,
-            num_right: 0,
-        }
-    }
-}
-
-impl From<SnailExplosion> for PieceExplosion {
-    fn from(snail: SnailExplosion) -> Self {
-        PieceExplosion{
-            changed: snail.changed,
-            piece: Piece::Snail(snail.snail),
-            num_left: snail.num_left,
-            num_right: snail.num_right,
-        }
-    }
-}
-
-fn try_explode_piece(piece: Piece, depth: usize) -> PieceExplosion {
+fn try_explode_piece(piece: &mut Piece, depth: usize) -> Option<Explosion> {
     match piece {
-        Piece::Num(n) => PieceExplosion{changed: false, piece: Piece::Num(n), num_left: 0, num_right: 0},
+        Piece::Num(_) => None,
         Piece::Snail(pair) => {
             if depth == 4 {
                 // Explode!
-                PieceExplosion{
-                    changed: true,
-                    piece: Piece::Num(0),
-                    num_left: if let Piece::Num(n) = pair.0 { n } else { unimplemented!() },
-                    num_right: if let Piece::Num(n) = pair.1 { n } else { unimplemented!() },
-                }
+                Some(Explosion{immediate: true, num_left: force_num(&pair.0), num_right: force_num(&pair.1)})
             } else {
-                try_explode_snail(pair, depth).into()
+                try_explode_snail(pair, depth)
             }
         },
     }
 }
 
-fn try_explode_snail(snail: SnailNum, depth: usize) -> SnailExplosion {
-    let left = try_explode_piece(snail.0, depth + 1);
-    if left.changed {
-        let mut adjusted_right = snail.1;
-        add_leftmost(&mut adjusted_right, left.num_right);
-        return SnailExplosion{
-            changed: true,
-            snail: Box::new((left.piece, adjusted_right)),
-            num_left: left.num_left,
-            num_right: 0,
-        };
-    }
-
-    let right = try_explode_piece(snail.1, depth + 1);
-    if right.changed {
-        let mut adjusted_left = left.piece;
-        add_rightmost(&mut adjusted_left, right.num_left);
-        return SnailExplosion{
-            changed: true,
-            snail: Box::new((adjusted_left, right.piece)),
-            num_left: 0,
-            num_right: right.num_right,
-        };
-    }
-
-    SnailExplosion::unchanged(left.piece, right.piece)
+#[inline]
+fn force_num(piece: &Piece) -> i32 {
+    if let Piece::Num(n) = piece { *n } else { unimplemented!() }
 }
 
-fn try_explode(snail: SnailNum) -> SnailExplosion {
+fn try_explode_snail(snail: &mut SnailNum, depth: usize) -> Option<Explosion> {
+    if let Some(explosion) = try_explode_piece(&mut snail.0, depth + 1) {
+        if explosion.immediate {
+            snail.0 = Piece::Num(0);
+        }
+
+        if explosion.num_right != 0 {
+            add_leftmost(&mut snail.1, explosion.num_right);
+        }
+        return Some(Explosion{
+            immediate: false,
+            num_left: explosion.num_left,
+            num_right: 0,
+        });
+    }
+
+    if let Some(explosion) = try_explode_piece(&mut snail.1, depth + 1) {
+        if explosion.immediate {
+            snail.1 = Piece::Num(0);
+        }
+
+        if explosion.num_left != 0 {
+            add_rightmost(&mut snail.0, explosion.num_left);
+        }
+        return Some(Explosion{
+            immediate: false,
+            num_left: 0,
+            num_right: explosion.num_right,
+        });
+    }
+
+    None
+}
+
+fn try_explode(snail: &mut SnailNum) -> Option<Explosion> {
     try_explode_snail(snail, 0)
 }
 
-fn try_split_piece(piece: Piece) -> (bool, Piece) {
-    match piece {
-        Piece::Num(n) =>
-            if n < 10 {
-                (false, Piece::Num(n))
-            } else {
-                // Split!
-                let a = n / 2;
-                let b = (n + 1) / 2;
-                (true, Piece::Snail(Box::new((Piece::Num(a), Piece::Num(b)))))
-            }
-        Piece::Snail(pair) => {
-            let (changed, snail) = try_split(pair);
-            (changed, Piece::Snail(snail))
-        },
-    }
+fn split_piece(n: i32) -> Piece {
+    let a = n / 2;
+    let b = (n + 1) / 2;
+    Piece::Snail(Box::new((Piece::Num(a), Piece::Num(b))))
 }
 
-fn try_split(snail: SnailNum) -> (bool, SnailNum) {
-    let left = try_split_piece(snail.0);
-    if left.0 {
-        return (true, Box::new((left.1, snail.1)));
+fn try_split(snail: &mut SnailNum) -> bool {
+    match &mut snail.0 {
+        Piece::Num(n) => {
+            if *n >= 10 {
+                // Split!
+                snail.0 = split_piece(*n);
+                return true;
+            }
+        }
+        Piece::Snail(pair) => {
+            if try_split(pair) {
+                return true;
+            }
+        },
     }
 
-    let right = try_split_piece(snail.1);
-    (right.0, Box::new((left.1, right.1)))
+    match &mut snail.1 {
+        Piece::Num(n) => {
+            if *n >= 10 {
+                // Split!
+                snail.1 = split_piece(*n);
+                return true;
+            }
+        }
+        Piece::Snail(pair) => {
+            if try_split(pair) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 fn reduce(mut snail: SnailNum) -> SnailNum {
     loop {
-        let exploded = try_explode(snail);
-        snail = exploded.snail;
-        if exploded.changed {
+        let exploded = try_explode(&mut snail);
+        if exploded.is_some() {
             continue;
         }
 
-        let split = try_split(snail);
-        snail = split.1;
-        if split.0 {
+        let split = try_split(&mut snail);
+        if split {
             continue;
         }
 
@@ -299,10 +284,11 @@ mod test {
         assert_eq!(result, expect);
 
         // Just the first explosion
-        let explosion = try_explode(parse_line("[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]"));
+        let mut result = parse_line("[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]");
+        let explosion = try_explode(&mut result);
         let expect = parse_line("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]");
-        assert!(explosion.changed);
-        assert_eq!(explosion.snail, expect);
+        assert!(explosion.is_some());
+        assert_eq!(result, expect);
 
         let result = reduce(parse_line("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]"));
         let expect = parse_line("[[3,[2,[8,0]]],[9,[5,[7,0]]]]");
