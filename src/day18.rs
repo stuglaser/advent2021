@@ -62,19 +62,17 @@ fn parse_line(line: &str) -> SnailNum {
     parse_snail_num(&mut it)
 }
 
-fn add_leftmost(piece: Piece, value: i32) -> Piece {
+fn add_leftmost(piece: &mut Piece, value: i32) {
     match piece {
-        Piece::Num(n) => Piece::Num(n + value),
-        Piece::Snail(pair) => Piece::Snail(
-            Box::new((add_leftmost(pair.0, value), pair.1))),
+        Piece::Num(n) => *n += value,
+        Piece::Snail(pair) => add_leftmost(&mut pair.0, value),
     }
 }
 
-fn add_rightmost(piece: Piece, value: i32) -> Piece {
+fn add_rightmost(piece: &mut Piece, value: i32) {
     match piece {
-        Piece::Num(n) => Piece::Num(n + value),
-        Piece::Snail(pair) => Piece::Snail(
-            Box::new((pair.0, add_rightmost(pair.1, value)))),
+        Piece::Num(n) => *n += value,
+        Piece::Snail(pair) => add_rightmost(&mut pair.1, value),
     }
 }
 
@@ -136,7 +134,8 @@ fn try_explode_piece(piece: Piece, depth: usize) -> PieceExplosion {
 fn try_explode_snail(snail: SnailNum, depth: usize) -> SnailExplosion {
     let left = try_explode_piece(snail.0, depth + 1);
     if left.changed {
-        let adjusted_right = add_leftmost(snail.1, left.num_right);
+        let mut adjusted_right = snail.1;
+        add_leftmost(&mut adjusted_right, left.num_right);
         return SnailExplosion{
             changed: true,
             snail: Box::new((left.piece, adjusted_right)),
@@ -147,7 +146,8 @@ fn try_explode_snail(snail: SnailNum, depth: usize) -> SnailExplosion {
 
     let right = try_explode_piece(snail.1, depth + 1);
     if right.changed {
-        let adjusted_left = add_rightmost(left.piece, right.num_left);
+        let mut adjusted_left = left.piece;
+        add_rightmost(&mut adjusted_left, right.num_left);
         return SnailExplosion{
             changed: true,
             snail: Box::new((adjusted_left, right.piece)),
