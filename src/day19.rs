@@ -1,4 +1,4 @@
-use std::{cmp::{min, max}, borrow::Borrow};
+use std::cmp::max;
 
 use rustc_hash::{FxHashMap, FxHashSet};
 
@@ -74,7 +74,6 @@ fn try_complete_match(scanner_a: &Scanner, scanner_b: &Scanner, mut matches: Vec
         }
     }
 
-    println!("  try_complete_match found {}", matches.len());
     matches
 }
 
@@ -211,26 +210,15 @@ impl std::fmt::Debug for Transform {
 
 // a = T * b
 fn solve_scanner_match(a: &Scanner, b: &Scanner, matches: &Vec<(usize, usize)>) -> Transform {
-    println!("Solving for {} matches", matches.len());
-    // let translation = &a.beacons[matches[0].0] - &b.beacons[matches[0].1];
-
     for j in 1..matches.len() {
         let va = &a.beacons[matches[j].0] - &a.beacons[matches[0].0];
         let vb = &b.beacons[matches[j].1] - &b.beacons[matches[0].1];
 
-        println!("  match[{}] = {} to {}", j, va, vb);
         if let Some(rot) = rotation_for(&va, &vb) {
             // Hacky way of getting the translation.
             let rot_only = Transform{t: Pt3::new(0,0,0), rot: rot.clone()};
-            let translation = &a.beacons[matches[0].0] - &rot_only.fwd(&b.beacons[matches[0].1]);
-
-            let tr = Transform{t: translation, rot};
-
-            for (idx_a, idx_b) in matches {
-                println!("  {} == {}  (from {})", a.beacons[*idx_a], tr.fwd(&b.beacons[*idx_b]), &b.beacons[*idx_b]);
-            }
-    
-            return tr;
+            let t = &a.beacons[matches[0].0] - &rot_only.fwd(&b.beacons[matches[0].1]);
+            return Transform{t, rot};
         }
     }
 
@@ -269,21 +257,7 @@ pub fn day19(test_mode: bool) {
         scanners
     };
 
-    for (i, sc) in scanners.iter().enumerate() {
-        println!("--- Scanner {}", i);
-        for beacon in &sc.beacons {
-            println!("  {:?}", beacon);
-        }
-        println!("");
-    }
-    println!("\n\n");
-
-    println!("Scanner 0:\n{}", scanners[0].fmt_table());
-    println!("Scanner 1:\n{}", scanners[1].fmt_table());
-
-    // println!("Parsed beacons: {:?}", scanners);
-
-    // Lots of lookup tables
+    // Aggregates by beacon distances, so we can easily seed matches to try.
     let mut lookup_distsqr = FxHashMap::<i32, Vec<(usize, usize, usize)>>::with_capacity_and_hasher(1000, Default::default());
 
     for (scanner_id, scanner) in scanners.iter().enumerate() {
@@ -303,15 +277,13 @@ pub fn day19(test_mode: bool) {
     let mut scanner_matches = Grid::filled(scanners.len(), scanners.len(), 0usize);
     // (A, B, [(beacon A, beacon B)], Transform(A <- B))
     let mut all_matches = Vec::<(usize, usize, Vec<(usize, usize)>, Transform)>::new();
-    for (starter_dist, starter_list) in &lookup_distsqr {
+    for starter_list in lookup_distsqr.values() {
         if starter_list.len() == 1 { continue; }
-        println!("Seeding with dist {} (have {})", starter_dist, starter_list.len());
 
         for match_idx_a in 0..starter_list.len() {
             for match_idx_b in (match_idx_a+1)..starter_list.len() {
                 let seed_a = &starter_list[match_idx_a];
                 let seed_b = &starter_list[match_idx_b];
-                println!("Seeding scanner match {}-{}", seed_a.0, seed_b.0);
 
                 if scanner_matches[(seed_a.0, seed_b.0)] > 0 {
                     continue; // Already matched
@@ -342,26 +314,14 @@ pub fn day19(test_mode: bool) {
         }
     }
 
-    // println!("Overlaps: {} out of scanners {}", scanner_matches.len(), scanners.len());
-
-    // println!("MATCHES:\n{}", scanner_matches.fmt_table());
-    // println!("All matches:");
-    // for m in &all_matches {
-    //     println!("  {} - {}  :: {:?}", m.0, m.1, m.2);
-    //     println!("Matched scanners with:\n{:?}", m.3);
-    // }
-
     // A very bad topological traversal of the scanners
     let mut solved: Vec<Option<Transform>> = vec![None; scanners.len()];
     solved[0] = Some(Transform::ident());
     'outer: loop {
-        println!("outer: {:?}", solved.iter().map(|o| o.is_some()).collect::<Vec<_>>());
         for m in &all_matches {
             if solved[m.0].is_some() && solved[m.1].is_none() {
-                println!("Solving {} <- {}", m.0, m.1);
                 solved[m.1] = Some(solved[m.0].as_ref().unwrap().chain(&m.3));
             } else if solved[m.0].is_none() && solved[m.1].is_some() {
-                println!("Solving {} <- {}", m.1, m.0);
                 solved[m.0] = Some(solved[m.1].as_ref().unwrap().chain(&m.3.inv()));
             }
         }
@@ -374,11 +334,6 @@ pub fn day19(test_mode: bool) {
         }
         break;
     }
-    println!("All solved!!");
-
-    for (i, tr) in solved.iter().enumerate() {
-        println!("Scanner {} at\n{:?}", i, tr.as_ref().unwrap());
-    }
 
     let mut all_beacons = FxHashSet::<Pt3>::with_capacity_and_hasher(30 * scanners.len(), Default::default());
     for i in 0..scanners.len() {
@@ -390,10 +345,8 @@ pub fn day19(test_mode: bool) {
         }
     }
 
-    println!("ACTUAL total beacons = {}", all_beacons.len());
-
     let part1 = all_beacons.len();
-    println!("Part 1: {}", part1);
+    // println!("Part 1: {}", part1);
     assert_eq!(part1, if test_mode { 79 } else { 436 });
 
     let mut max_dist = 0;
@@ -404,7 +357,7 @@ pub fn day19(test_mode: bool) {
     }
 
     let part2 = max_dist;
-    println!("Part 2: {}", part2);
+    // println!("Part 2: {}", part2);
     assert_eq!(part2, if test_mode { 3621 } else { 10918 });
 }
 
