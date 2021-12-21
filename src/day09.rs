@@ -13,7 +13,7 @@ fn lookup_canonical_and_collapse(collapsing: &mut [i32], idx: i32) -> i32 {
     }
 }
 
-pub fn day09(test_mode: bool) {
+pub fn day09(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input09.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
     let input_str = if test_mode {
@@ -55,7 +55,7 @@ pub fn day09(test_mode: bool) {
             }
         }
     }
-    // println!("Part 1: {}", part1);
+    if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 15 } else { 548 });
 
     // Really 9's are just the boundaries, and every other value is the same.
@@ -109,6 +109,6 @@ pub fn day09(test_mode: bool) {
         }
     }
     let part2 = top3[1] * top3[2] * top3[3];
-    // println!("Part 2: {}", part2);
+    if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 1134 } else { 786048 });
 }

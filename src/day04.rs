@@ -4,7 +4,7 @@ use rustc_hash::FxHashMap;
 use crate::utils::*;
 
 
-pub fn day04(_test_mode: bool) {
+pub fn day04(_test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input04.txt";
     let input_str = std::fs::read_to_string(INPUT).unwrap();
 
@@ -58,7 +58,9 @@ pub fn day04(_test_mode: bool) {
             }
         }
     }
-    //println!("Answers: {} {}", first_score, last_score);
+    if print {
+        println!("Answers: {} {}", first_score, last_score);
+    }
     assert_eq!(first_score, 27027);
     assert_eq!(last_score, 36975);
 }

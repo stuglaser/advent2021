@@ -41,7 +41,7 @@ fn iter_along(a: i32, b: i32) -> AlongIterator {
     AlongIterator{next: a, end: b, step: (b - a).signum()}
 }
 
-pub fn day05(_test_mode: bool) {
+pub fn day05(_test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input05.txt";
     let input_str = std::fs::read_to_string(INPUT).unwrap();
 
@@ -82,8 +82,12 @@ pub fn day05(_test_mode: bool) {
     //println!("Hash size: {}", locs.len());
     let part1 = horvert_locs.into_values().filter(|cnt| *cnt > 1).count();
     let part2 = locs.into_values().filter(|cnt| *cnt > 1).count();
-    //println!("Part 1: {}", part1);
+    if print {
+        println!("Part 1: {}", part1);
+    }
     assert_eq!(part1, 8111);
-    //println!("Part 2: {}", part2);
+    if print {
+        println!("Part 2: {}", part2);
+    }
     assert_eq!(part2, 22088);
 }

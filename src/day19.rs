@@ -225,7 +225,7 @@ fn solve_scanner_match(a: &Scanner, b: &Scanner, matches: &Vec<(usize, usize)>) 
     panic!("No match found");
 }
 
-pub fn day19(test_mode: bool) {
+pub fn day19(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input19.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
     let input_str = if test_mode {
@@ -346,7 +346,7 @@ pub fn day19(test_mode: bool) {
     }
 
     let part1 = all_beacons.len();
-    // println!("Part 1: {}", part1);
+    if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 79 } else { 436 });
 
     let mut max_dist = 0;
@@ -357,7 +357,7 @@ pub fn day19(test_mode: bool) {
     }
 
     let part2 = max_dist;
-    // println!("Part 2: {}", part2);
+    if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 3621 } else { 10918 });
 }
 

@@ -214,7 +214,7 @@ fn mag(snail: &SnailNum) -> i32 {
     3 * mag_piece(&snail.0) + 2 * mag_piece(&snail.1)
 }
 
-pub fn day18(test_mode: bool) {
+pub fn day18(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input18.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
     let input_str = if test_mode {
@@ -239,7 +239,7 @@ pub fn day18(test_mode: bool) {
 
 
     let part1 = mag(&sum);
-    // println!("Part 1: {}", part1);
+    if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 4140 } else { 3987 });
 
     let mut best_mag = 0;
@@ -251,7 +251,7 @@ pub fn day18(test_mode: bool) {
     }
 
     let part2 = best_mag;
-    // println!("Part 2: {}", part2);
+    if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 3993 } else { 4500 });
 }
 

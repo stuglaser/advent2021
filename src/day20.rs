@@ -114,7 +114,7 @@ fn pgrid(grid: &Grid<u8>) {
     println!("{}", ch.fmt_compact());
 }
 
-pub fn day20(test_mode: bool) {
+pub fn day20(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input20.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
     let input_str = if test_mode {
@@ -157,7 +157,7 @@ pub fn day20(test_mode: bool) {
     }
 
     let part1 = sum;
-    // println!("Part 1: {}", part1);
+    if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 35 } else { 5379 });
 
     let mut current = grid;
@@ -170,7 +170,7 @@ pub fn day20(test_mode: bool) {
     }
 
     let part2 = sum;
-    // println!("Part 2: {}", part2);
+    if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 3351 } else { 17917 });
 }
 

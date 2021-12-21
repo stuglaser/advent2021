@@ -27,7 +27,7 @@ fn solve_from_pairs(initial: &str, pairs: &FxHashMap<String, usize>) -> usize {
     hi - lo
 }
 
-pub fn day14(test_mode: bool) {
+pub fn day14(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input14.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
     let input_str = if test_mode {
@@ -108,10 +108,10 @@ CN -> C"
     }
 
     let part1 = solve_from_pairs(&initial, &pairs10);
-    // println!("Part 1: {}", part1);
+    if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 1588 } else { 3284 });
 
     let part2 = solve_from_pairs(&initial, &pairs);
-    // println!("Part 2: {}", part2);
+    if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 2188189693529 } else { 4302675529689 });
 }

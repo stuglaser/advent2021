@@ -32,7 +32,7 @@ fn incomplete_score_of(ch: u8) -> usize {
     }
 }
 
-pub fn day10(test_mode: bool) {
+pub fn day10(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input10.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
     let input_str = if test_mode {
@@ -75,11 +75,11 @@ pub fn day10(test_mode: bool) {
         incomplete_scores.push(incomplete_score);
     }
 
-    // println!("Part 1: {}", part1);
+    if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 26397 } else { 265527 });
 
     incomplete_scores.sort();
     let part2 = incomplete_scores[incomplete_scores.len() / 2];
-    // println!("Part 2: {}", part2);
+    if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 288957 } else { 3969823589 });
 }

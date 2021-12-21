@@ -1,7 +1,7 @@
 use crate::utils::*;
 
 
-pub fn day03(_test_mode: bool) {
+pub fn day03(_test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input03.txt";
     let input_str = std::fs::read_to_string(INPUT).unwrap();
 
@@ -49,7 +49,9 @@ pub fn day03(_test_mode: bool) {
             epsilon += 1;
         }
     }
-    //println!("Part 1: {}  (because {:?})", gamma * epsilon, cnt_ones);
+    if print {
+        println!("Part 1: {}  (because {:?})", gamma * epsilon, cnt_ones);
+    }
     assert_eq!(gamma * epsilon, 3959450);
 
     // Oxygen
@@ -111,6 +113,8 @@ pub fn day03(_test_mode: bool) {
     }
     let co2 = value;
 
-    //println!("Part 2: {}", oxygen * co2);
+    if print {
+        println!("Part 2: {}", oxygen * co2);
+    }
     assert_eq!(oxygen * co2, 7440311);
 }

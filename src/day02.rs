@@ -2,7 +2,7 @@ use std::io::{BufRead, BufReader};
 use std::fs::File;
 
 
-pub fn day02(_test_mode: bool) {
+pub fn day02(_test_mode: bool, print: bool) {
     let reader = BufReader::new(File::open("inputs/input02.txt").expect("Cannot open file"));
     enum Dir {
         Forward, Up, Down
@@ -31,7 +31,9 @@ pub fn day02(_test_mode: bool) {
         }
     }
 
-    //println!("Part 1: {}", x * depth);
+    if print {
+        println!("Part 1: {}", x * depth);
+    }
     assert_eq!(x * depth, 1670340);
 
     let mut x = 0;
@@ -44,6 +46,8 @@ pub fn day02(_test_mode: bool) {
             Dir::Down => aim += dist,
         }
     }
-    //println!("Part 2: {}", x * depth);
+    if print {
+        println!("Part 2: {}", x * depth);
+    }
     assert_eq!(x * depth, 1954293920);
 }

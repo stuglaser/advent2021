@@ -95,7 +95,7 @@ fn wrap(risk: u8) -> u8 {
     (risk - 1) % 9 + 1
 }
 
-pub fn day15(test_mode: bool) {
+pub fn day15(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input15.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
     let input_str = if test_mode {
@@ -116,7 +116,7 @@ pub fn day15(test_mode: bool) {
     let grid = parse_digit_grid(input_str);
 
     let part1 = find_min_risk(&grid);
-    // println!("Part 1: {}", part1);
+    if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 40 } else { 458 });
 
 
@@ -132,6 +132,6 @@ pub fn day15(test_mode: bool) {
     // println!("Big grid:\n\n{}", big_grid.fmt_compact());
 
     let part2 = find_min_risk(&big_grid);
-    // println!("Part 2: {}", part2);
+    if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 315 } else { 2800 });
 }

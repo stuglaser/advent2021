@@ -42,7 +42,7 @@ mod day21;
 // mod day23;
 // mod day24;
 // mod day25;
-static DAYS: &'static [fn(bool)] = &[
+static DAYS: &'static [fn(bool, bool)] = &[
     day01::day01,
     day02::day02,
     day03::day03,
@@ -87,7 +87,7 @@ fn main() {
             let started = Instant::now();
             let mut samples = 0;
             while started.elapsed().as_secs_f32() < atleast {
-                DAYS[i](opts.test);
+                DAYS[i](opts.test, false);
                 samples += 1;
             }
             let elapsed = started.elapsed();
@@ -99,11 +99,11 @@ fn main() {
         // Running one day or everything?
         let runner: Box<dyn Fn()> = match opts.day {
             Some(day) => Box::new(move || {
-                DAYS[day as usize - 1](opts.test);
+                DAYS[day as usize - 1](opts.test, opts.repeat == 1 && opts.atleast.is_none());
             }),
             None => Box::new(|| {
                 for run_day in DAYS {
-                    run_day(opts.test);
+                    run_day(opts.test, false);
                 }
             })
         };

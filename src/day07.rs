@@ -23,7 +23,7 @@ fn optimize_cost(input: &[i32], cost_at: impl Fn(&[i32], i32) -> i32) -> i32 {
     }
 }
 
-pub fn day07(test_mode: bool) {
+pub fn day07(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input07.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
     let input_str = if test_mode {
@@ -47,7 +47,7 @@ pub fn day07(test_mode: bool) {
     };
 
     let part1 = optimize_cost(&input, cost_at);
-    // println!("Part 1: {}", part1);
+    if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 37 } else { 356922 });
 
 
@@ -61,6 +61,6 @@ pub fn day07(test_mode: bool) {
     };
 
     let part2 = optimize_cost(&input, cost_at_quadratic);
-    // println!("Part 2: {}", part2);
+    if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 168 } else { 100347031 });
 }

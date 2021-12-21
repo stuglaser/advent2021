@@ -2,7 +2,7 @@ use std::io::{BufRead, BufReader};
 use std::fs::File;
 
 
-pub fn day01(_test_mode: bool) {
+pub fn day01(_test_mode: bool, print: bool) {
     let reader = BufReader::new(File::open("inputs/input01.txt").expect("Cannot open file"));
     let mut inputs = Vec::<i32>::with_capacity(100);
     for line in reader.lines() {
@@ -23,7 +23,9 @@ pub fn day01(_test_mode: bool) {
     // }
     
 
-    //println!("Day 1.  Part 1: {}", cnt);
+    if print {
+        println!("Day 1.  Part 1: {}", cnt);
+    }
     assert_eq!(cnt, 1215);
 
     let mut cnt = 0;
@@ -35,6 +37,8 @@ pub fn day01(_test_mode: bool) {
             cnt += 1;
         }
     }
-    //println!("Day 1.  Part 2: {}", cnt);
+    if print {
+        println!("Day 1.  Part 2: {}", cnt);
+    }
     assert_eq!(cnt, 1150);
 }

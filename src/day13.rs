@@ -3,7 +3,7 @@ use crate::utils::*;
 use rustc_hash::FxHashSet;
 
 
-pub fn day13(test_mode: bool) {
+pub fn day13(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input13.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
     let input_str = if test_mode {
@@ -89,24 +89,26 @@ fold along x=5"
 
 
     let part1 = first_fold_dots; // dots_showing.len();
-    // println!("Part 1: {}", part1);
+    if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 17 } else { 720 });
 
-    // let mut out = String::with_capacity(1000);
-    // for y in 0..100 {
-    //     for x in 0..100 {
-    //         if dots_showing.contains(&Pt{x: x, y: y}) {
-    //             out += "#";
-    //         } else {
-    //             out += " ";
-    //         }
-    //     }
-    //     out += "\n";
-    // }
-    // println!("{}", out);
+    if print {
+        let mut out = String::with_capacity(1000);
+        for y in 0..100 {
+            for x in 0..100 {
+                if dots_showing.contains(&Pt{x: x, y: y}) {
+                    out += "#";
+                } else {
+                    out += " ";
+                }
+            }
+            out += "\n";
+        }
+        println!("{}", out);
+    }
 
     let part2 = dots_showing.len();
-    // println!("Part 2: {}", part2);
+    if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 16 } else { 104 });
     //AHPRPAUZ
 }

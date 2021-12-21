@@ -106,7 +106,7 @@ fn parse_packet(sn: &mut BitsSnarfer) -> PacketResult {
     }
 }
 
-pub fn day16(test_mode: bool) {
+pub fn day16(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input16.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
     let input_str = if test_mode {
@@ -124,11 +124,11 @@ pub fn day16(test_mode: bool) {
     let parsed = parse_packet(&mut sn);
 
     let part1 = parsed.sum_versions;
-    // println!("Part 1: {}", part1);
+    if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 20 } else { 925 });
 
 
     let part2 = parsed.value;
-    // println!("Part 2: {}", part2);
+    if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 1 } else { 342997120375 });
 }

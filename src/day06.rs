@@ -1,4 +1,4 @@
-pub fn day06(test_mode: bool) {
+pub fn day06(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input06.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
     let input_str = if test_mode {
@@ -29,9 +29,9 @@ pub fn day06(test_mode: bool) {
             part1 = current.iter().sum::<usize>();
         }
     }
-    //println!("Part 1: {}", part1);
+    if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 5934 } else { 351188 });
     let part2 = current.iter().sum::<usize>();
-    //println!("Part 2: {}", part2);
+    if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 26984457539 } else { 1595779846729 });
 }

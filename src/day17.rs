@@ -12,7 +12,7 @@ fn step(p: &mut Pt, v: &mut Pt) {
     v.y -= 1;
 }
 
-pub fn day17(test_mode: bool) {
+pub fn day17(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input17.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
     let input_str = if test_mode {
@@ -65,10 +65,10 @@ pub fn day17(test_mode: bool) {
         }
     }
     let part1 = best_y;
-    // println!("Part 1: {}", part1);
+    if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 45 } else { 5886 });
 
     let part2 = total_hits;
-    // println!("Part 2: {}", part2);
+    if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 112 } else { 1806 });
 }

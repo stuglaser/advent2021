@@ -11,7 +11,7 @@ fn char_to_bits(ch: u8) -> u8 {
     }
 }
 
-pub fn day08(test_mode: bool) {
+pub fn day08(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input08.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
     let input_str = if test_mode {
@@ -134,8 +134,8 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
     }
 
     let part1 = count_simples;
-    // println!("Part 1: {}", part1);
+    if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 26 } else { 449 });
-    // println!("Part 2: {}", part2);
+    if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 61229 } else { 968175 });
 }

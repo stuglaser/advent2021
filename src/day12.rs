@@ -35,7 +35,7 @@ fn count_paths(edges: &Graph, is_small: &[bool], seen: &mut [bool], at: usize, s
 }
 
 
-pub fn day12(test_mode: bool) {
+pub fn day12(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input12.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
     let input_str = if test_mode {
@@ -95,9 +95,9 @@ start-RW"
     let part1 = count_paths(&edges, &is_small, &mut seen, 0, 0);
     let part2 = count_paths(&edges, &is_small, &mut seen, 0, 1);
 
-    // println!("Part 1: {}", part1);
+    if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 226 } else { 3369 });
 
-    // println!("Part 2: {}", part2);
+    if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 3509 } else { 85883 });
 }
