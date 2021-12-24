@@ -77,7 +77,7 @@ fn parse_steps(input_str: &str) -> Vec::<(bool, Prism)> {
     steps
 }
 
-fn count_on_helper(steps: &Vec<(bool, Prism)>, axis: usize) -> usize {
+fn count_on_helper(steps: &Vec<(bool, Prism)>, axis: usize, scratch: &mut Vec<i32>) -> usize {
     if steps.len() == 0 {
         return 0;
     }
@@ -103,7 +103,9 @@ fn count_on_helper(steps: &Vec<(bool, Prism)>, axis: usize) -> usize {
         return step.1.volume();
     }
 
-    let mut splits = Vec::<i32>::with_capacity(steps.len() * 2);
+    // let mut splits = Vec::<i32>::with_capacity(steps.len() * 2);
+    let mut splits = scratch;
+    splits.clear();
     for step in steps {
         let prism = &step.1;
         let a = match axis { 0 => prism.a.x, 1 => prism.a.y, 2 => prism.a.z, _ => unimplemented!() };
@@ -170,12 +172,13 @@ fn count_on_helper(steps: &Vec<(bool, Prism)>, axis: usize) -> usize {
 
     // println!("Split on {} at {}  splits {} into {}, {}", axis, middle, steps.len(), lower.len(), upper.len());
 
-    count_on_helper(&lower, (axis + 1) % 3) +
-    count_on_helper(&upper, (axis + 1) % 3)
+    count_on_helper(&lower, (axis + 1) % 3, splits) +
+    count_on_helper(&upper, (axis + 1) % 3, splits)
 }
 
 fn count_on(steps: &Vec<(bool, Prism)>) -> usize {
-    count_on_helper(steps, 0)
+    let mut scratch = Vec::<i32>::with_capacity(steps.len() * 2);
+    count_on_helper(steps, 0, &mut scratch)
 }
 
 pub fn day22(test_mode: bool, print: bool) {
