@@ -116,6 +116,28 @@ impl<T> Grid<T> {
     }
 }
 
+impl Grid<u8> {
+    #[allow(dead_code)]
+    pub fn fmt_map(&self) -> String
+    {
+        let mut out = String::with_capacity(self.rows * (self.cols + 1));
+        for (idx, value) in self.data.iter().enumerate() {
+            let printable =
+                if *value == 0 {
+                    ' '
+                } else {
+                    *value as char
+                };
+            out.push(printable);
+
+            if idx % self.cols == self.cols - 1 {
+                out.push('\n');
+            }
+        }
+        out
+    }
+}
+
 impl<T> Index<(usize, usize)> for Grid<T> {
     type Output = T;
 

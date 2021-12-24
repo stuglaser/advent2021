@@ -104,7 +104,7 @@ fn count_on_helper(steps: &Vec<(bool, Prism)>, axis: usize, scratch: &mut Vec<i3
     }
 
     // let mut splits = Vec::<i32>::with_capacity(steps.len() * 2);
-    let mut splits = scratch;
+    let splits = scratch;
     splits.clear();
     for step in steps {
         let prism = &step.1;
