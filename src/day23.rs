@@ -1,6 +1,6 @@
 use crate::utils::*;
 
-use std::cmp::{min, max};
+use std::cmp::min;
 
 const R_HALL: usize = 1;
 
@@ -76,7 +76,30 @@ fn hall_spots(map: &Grid<u8>, col: usize) -> Vec<usize> {
     stoppable
 }
 
-fn solve(map: &mut Grid<u8>, locs: &mut [(usize, usize)]) -> usize {
+fn is_deadlock(map: &Grid<u8>) -> bool {
+    for a in 1..(map.cols - 1) {
+        let ch_a = map[(R_HALL, a)];
+        if ch_a == 0 { continue; }
+        let goal_a = (ch_a - b'A') as usize * 2 + 3;
+
+        for b in (a+1)..(map.cols - 1) {
+            let ch_b = map[(R_HALL, b)];
+            if ch_b == 0 { continue; }
+            let goal_b = (ch_b - b'A') as usize * 2 + 3;
+
+            if (a < b && goal_b < a && b < goal_a) ||
+                (b < a && goal_b > a && goal_a < b) {
+                    // println!("DEADLOCK!  {}", (0..map.cols).map(|c| { let ch = map[(R_HALL, c)]; if ch == 0 {' '} else {ch as char}}).collect::<String>());
+                    return true;
+            }
+        }
+    }
+
+    false
+}
+
+fn solve(map: &mut Grid<u8>, locs: &mut [(usize, usize)], cnt: &mut usize) -> usize {
+    *cnt += 1;
     let mut best_cost = usize::MAX;
 
     // println!("SOLVE: {:?}\n{}", locs, map.fmt_map());
@@ -92,6 +115,11 @@ fn solve(map: &mut Grid<u8>, locs: &mut [(usize, usize)]) -> usize {
         }
     }
     if finished { return 0; }
+
+    // Fewer checks, but slower by 0.6s
+    // if is_deadlock(map) {
+    //     return usize::MAX;
+    // }
 
     // First we do placements, since placements are always good.
     for i in 0..locs.len() {
@@ -123,7 +151,7 @@ fn solve(map: &mut Grid<u8>, locs: &mut [(usize, usize)]) -> usize {
                     locs[i] = (space, goal_col);
                     let hall_steps = if loc.1 > goal_col { loc.1 - goal_col } else { goal_col - loc.1 };
                     let move_cost = (space - R_HALL + hall_steps) * per_step_cost;
-                    let beyond_cost = solve(map, locs);
+                    let beyond_cost = solve(map, locs, cnt);
                     locs[i] = loc;
                     map[loc] = ch;
                     map[(space, goal_col)] = 0;
@@ -161,7 +189,7 @@ fn solve(map: &mut Grid<u8>, locs: &mut [(usize, usize)]) -> usize {
                     map[loc] = 0;
                     locs[i] = (R_HALL, c);
                     let move_cost = (steps_out + (c as i32 - loc.1 as i32).abs() as usize) * per_step_cost;
-                    let beyond_cost = solve(map, locs);
+                    let beyond_cost = solve(map, locs, cnt);
                     if beyond_cost < usize::MAX {
                         best_cost = min(best_cost, move_cost + beyond_cost);
                     }
@@ -226,8 +254,10 @@ pub fn day23(test_mode: bool, print: bool) {
     println!("Start locs: {:?}", start_locs);
     println!("Start grid:\n{}", start_grid.fmt_map());
 
-    let part1 = solve(&mut start_grid, &mut start_locs);
+    let mut cnt1 = 0;
+    let part1 = solve(&mut start_grid, &mut start_locs, &mut cnt1);
     println!("Should show {} but show is {}", part1, print);
+    println!("Part 1 count: {}", cnt1);
     if print { println!("Part 1: {}", part1); }
     assert_eq!(part1, if test_mode { 12521 } else { 14371 });
 
@@ -245,7 +275,9 @@ pub fn day23(test_mode: bool, print: bool) {
     println!("Extended: {:?}\n{}", ext_locs, ext_grid.fmt_map());
 
 
-    let part2 = solve(&mut ext_grid, &mut ext_locs);
+    let mut cnt2 = 0;
+    let part2 = solve(&mut ext_grid, &mut ext_locs, &mut cnt2);
+    println!("Part 2 count: {}", cnt2);
     if print { println!("Part 2: {}", part2); }
     assert_eq!(part2, if test_mode { 44169 } else { 40941 });
 }
