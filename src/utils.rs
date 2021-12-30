@@ -1,5 +1,10 @@
 use std::{ops::{Index, IndexMut}, cmp::max};
 
+#[inline]
+pub fn abs_diff(a: usize, b: usize) -> usize {
+    if a > b { a - b } else { b - a }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Pt {
     pub x: i32,

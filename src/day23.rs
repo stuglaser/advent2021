@@ -96,6 +96,21 @@ fn with_move(locs: &[(usize, usize)], idx: usize, loc: (usize, usize)) -> Vec<(u
     next_locs
 }
 
+fn cost_to_go(locs: &[(usize, usize)]) -> usize {
+    let mut cost = 0;
+    for (i, loc) in locs.iter().enumerate() {
+        let ch_idx = i * 4 / locs.len();
+        let c_goal = ch_idx * 2 + 3;
+        if loc.1 != c_goal {
+            cost += 10usize.pow(ch_idx as u32) * (
+                abs_diff(loc.1, c_goal) +
+                loc.0 - R_HALL +
+                1);
+        }
+    }
+    cost
+}
+
 fn solve_search(init_map: &Grid<u8>, init_locs: &[(usize, usize)], cnt: &mut usize) -> usize {
     // Checks for being finished
     if is_solved(init_map) {
@@ -116,13 +131,12 @@ fn solve_search(init_map: &Grid<u8>, init_locs: &[(usize, usize)], cnt: &mut usi
     let mut scratch_map = empty_map.clone();
 
     let mut seen = FxHashSet::<Vec<(usize, usize)>>::with_capacity_and_hasher(100, Default::default());
-
     let mut pq = BinaryHeap::with_capacity(100);
-    pq.push(ByFirstRev((0usize, init_locs.to_owned())));
+    pq.push(ByFirstRev((cost_to_go(init_locs), 0usize, init_locs.to_owned())));
 
     while !pq.is_empty() {
         *cnt += 1;
-        let ByFirstRev((cost, locs)) = pq.pop().unwrap();
+        let ByFirstRev((_, cost, locs)) = pq.pop().unwrap();
         // println!("Visiting [{}] cost = {}: {:?}\n{}", *cnt, cost, locs, map.fmt_map());
 
         if seen.contains(&locs) {
@@ -174,7 +188,8 @@ fn solve_search(init_map: &Grid<u8>, init_locs: &[(usize, usize)], cnt: &mut usi
                         let move_cost = (space - R_HALL + hall_steps) * per_step_cost;
 
                         let moved = with_move(&locs, i, (space, goal_col));
-                        pq.push(ByFirstRev((cost + move_cost, moved)));
+                        let to_go = cost_to_go(&moved);
+                        pq.push(ByFirstRev((cost + move_cost + to_go, cost + move_cost, moved)));
 
                         placement_successful = true;
                         break;
@@ -205,7 +220,8 @@ fn solve_search(init_map: &Grid<u8>, init_locs: &[(usize, usize)], cnt: &mut usi
                     for c in hall_spots(&map, loc.1) {
                         let move_cost = (steps_out + (c as i32 - loc.1 as i32).abs() as usize) * per_step_cost;
                         let moved = with_move(&locs, i, (R_HALL, c));
-                        pq.push(ByFirstRev((cost + move_cost, moved)));
+                        let to_go = cost_to_go(&moved);
+                        pq.push(ByFirstRev((cost + move_cost + to_go, cost + move_cost, moved)));
                     }
                 }
             }
