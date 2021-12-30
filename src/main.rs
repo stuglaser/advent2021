@@ -1,6 +1,7 @@
 use std::time::Instant;
 
 use clap::Parser;
+use thousands::Separable;
 
 
 #[derive(Parser)]
@@ -92,7 +93,7 @@ fn main() {
             }
             let elapsed = started.elapsed();
             total += (elapsed / samples).as_secs_f64();
-            println!("Day {:2} | {:7} µs  ({} samples)", i + 1, (elapsed / samples).as_micros(), samples);
+            println!("Day {:2} | {:>7} µs  ({} samples)", i + 1, (elapsed / samples).as_micros().separate_with_commas(), samples);
         }
         println!("Theoretical total: {} ms", total * 1000.0);
     } else {  // Benchmarks the total
