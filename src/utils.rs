@@ -66,7 +66,6 @@ impl std::ops::Sub for &Pt3 {
 }
 
 
-#[derive(Clone)]
 pub struct Grid<T> {
     pub rows: usize,
     pub cols: usize,
@@ -166,6 +165,18 @@ impl<T> IndexMut<&Pt> for Grid<T> {
     }
 }
 
+impl<T: Clone> Clone for Grid<T> {
+    fn clone(&self) -> Self {
+        Self { rows: self.rows, cols: self.cols, data: self.data.clone() }
+    }
+
+    fn clone_from(&mut self, other: &Self) {
+        self.rows = other.rows;
+        self.cols = other.cols;
+        self.data.clone_from(&other.data);
+    }
+}
+
 #[allow(dead_code)]
 pub fn tabulate(table: &Grid<String>) -> String {
     let mut lengths = vec![0; table.cols];
@@ -188,3 +199,47 @@ pub fn tabulate(table: &Grid<String>) -> String {
     }
     out
 }
+
+// Ordering by the first element of a tuple (in reverse)
+#[repr(transparent)]
+#[derive(Debug)]
+pub struct ByFirstRev<T>(pub T);
+
+impl<A: PartialEq, B> PartialEq for ByFirstRev<(A, B)> {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.0 == other.0.0
+    }
+}
+impl<A: Eq, B> Eq for ByFirstRev<(A, B)> {}
+
+impl<A: PartialOrd, B> PartialOrd for ByFirstRev<(A, B)> {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        other.0.0.partial_cmp(&self.0.0)
+    }
+}
+
+impl<A: Ord, B> Ord for ByFirstRev<(A, B)> {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        other.0.0.cmp(&self.0.0)
+    }
+}
+
+impl<A: PartialEq, B, C> PartialEq for ByFirstRev<(A, B, C)> {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.0 == other.0.0
+    }
+}
+impl<A: Eq, B, C> Eq for ByFirstRev<(A, B, C)> {}
+
+impl<A: PartialOrd, B, C> PartialOrd for ByFirstRev<(A, B, C)> {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        other.0.0.partial_cmp(&self.0.0)
+    }
+}
+
+impl<A: Ord, B, C> Ord for ByFirstRev<(A, B, C)> {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        other.0.0.cmp(&self.0.0)
+    }
+}
+

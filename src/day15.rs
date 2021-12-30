@@ -21,31 +21,6 @@ pub fn parse_digit_grid(string: &str) -> Grid<u8> {
 }
 
 
-// Ordering by the first element of a tuple (in reverse)
-#[repr(transparent)]
-#[derive(Debug)]
-pub struct ByFirstRev<T>(pub T);
-
-impl<A: PartialEq, B> PartialEq for ByFirstRev<(A, B)> {
-    fn eq(&self, other: &Self) -> bool {
-        self.0.0 == other.0.0
-    }
-}
-impl<A: Eq, B> Eq for ByFirstRev<(A, B)> {}
-
-impl<A: PartialOrd, B> PartialOrd for ByFirstRev<(A, B)> {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        other.0.0.partial_cmp(&self.0.0)
-    }
-}
-
-impl<A: Ord, B> Ord for ByFirstRev<(A, B)> {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        other.0.0.cmp(&self.0.0)
-    }
-}
-
-
 fn find_min_risk(grid: &Grid<u8>) -> usize {
     let mut visited = Grid{rows: grid.rows, cols: grid.cols, data: vec![false; grid.data.len()]};
 
