@@ -1,3 +1,5 @@
+use regex::Regex;
+
 #[derive(Debug)]
 enum Var {
     Imm(i64),
@@ -98,6 +100,13 @@ fn run(program: &Vec<Op>, input: &[u8], mut trace_maybe: Option<&mut Vec<i64>>) 
     regs[3]
 }
 
+#[derive(Debug)]
+struct Block {
+    offset: i64,
+    zdiv: i64,
+    added: i64,
+}
+
 pub fn day24(test_mode: bool, print: bool) {
     const INPUT: &str = "inputs/input24.txt";
     let file_str = std::fs::read_to_string(INPUT).unwrap();
@@ -114,38 +123,92 @@ pub fn day24(test_mode: bool, print: bool) {
         program.push(instr);
     }
 
-    let value = 39999698799429usize;
-    let z= run(&program, value.to_string().as_bytes(), None);
-    if print { println!("Part 1: ({})  {}", z, value); }
+    // Every block has the same structure:
+    //
+    // read w
+    // boost = z % 26 + <offset> != w
+    // z /= <zdiv: 1 or 26>
+    // if boost:
+    //     z = z * 26 + <added> + w
+    
 
-    let value = 18116121134117usize;
-    let z= run(&program, value.to_string().as_bytes(), None);
-    if print { println!("Part 2: ({})  {}", z, value); }
+    let re_parse_blocks = Regex::new(r"inp w
+mul x 0
+add x z
+mod x 26
+div z (\d+)
+add x (-?\d+)
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y (-?\d+)
+mul y x
+add z y").unwrap();
 
-    // for model in (11111111111111usize..99999999999999).rev() {
-    //     let prog_input_str = model.to_string();
-    //     if prog_input_str.find("0").is_some() { continue; }
-    //     let mut trace = Vec::<i64>::with_capacity(14);
+    let mut blocks = Vec::<Block>::with_capacity(16);
+    for cap in re_parse_blocks.captures_iter(input_str) {
+        // println!("CAPTURE: {:?}", cap);
+        blocks.push(Block {
+            offset: cap[2].parse().unwrap(),
+            zdiv: cap[1].parse().unwrap(),
+            added: cap[3].parse().unwrap() });
+    }
+    
+    // (a, b, offset) -> a = b + offset
+    let mut constraints = Vec::<(usize, usize, i64)>::new();
 
-    //     let z = run(&program, prog_input_str.as_bytes(), Some(&mut trace));
+    let mut stack = Vec::<(usize, i64)>::new();
+    for (i, block) in blocks.iter().enumerate() {
+        assert_eq!(block.offset < 10, block.zdiv == 26);
 
-    //     // if model % 75982 == 0 { println!("Model {} -> result {:?}", model, regs); }
-    //     println!("Model {} -> result {:?}   trace {:?}", model, z, trace.iter().map(|x| letters(*x)).collect::<Vec<_>>());
-    //     if z == 0 {
-    //         break;
-    //     }
-    // }
+        if block.zdiv == 26 {
+            // Reducing step. Need to prevent the increase
+            let assoc = stack.pop().unwrap();
+            constraints.push((i, assoc.0, assoc.1 + block.offset));
+        } else {
+            // Increasing step
+            stack.push((i, block.added));
+        }
+    }
+    // Maximizing
+    let mut value = vec![0u8; 14];
+    for c in &constraints {
+        if c.2 >= 0 {
+            value[c.0] = b'9';
+            value[c.1] = b'9' - c.2 as u8;
+        } else {
+            value[c.0] = b'9' - ((-c.2) as u8);
+            value[c.1] = b'9';
+        }
+    }
 
-    // TODO: check DIV truncation/rounding behavior
+    let z= run(&program, &value, None);
+    if print { println!("Part 1: ({})  {}", z, String::from_utf8_lossy(&value)); }
+    assert_eq!(z, 0);
+    assert_eq!(value, b"39999698799429");
 
-    // let part1 = solve(&mut start_grid, &mut start_locs, &mut cnt1);
-    // println!("Should show {} but show is {}", part1, print);
-    // if print { println!("Part 1: {}", part1); }
-    // assert_eq!(part1, if test_mode { 12521 } else { 14371 });
+    // Minimizing
+    let mut value = vec![0u8; 14];
+    for c in &constraints {
+        if c.2 >= 0 {
+            value[c.0] = b'1' + c.2 as u8;
+            value[c.1] = b'1';
+        } else {
+            value[c.0] = b'1';
+            value[c.1] = b'1' + ((-c.2) as u8);
+        }
+    }
 
-    // let part2 = solve(&mut ext_grid, &mut ext_locs, &mut cnt2);
-    // if print { println!("Part 2: {}", part2); }
-    // assert_eq!(part2, if test_mode { 44169 } else { 40941 });
+    let z= run(&program, &value, None);
+    if print { println!("Part 2: ({})  {}", z, String::from_utf8_lossy(&value)); }
+    assert_eq!(z, 0);
+    assert_eq!(value, b"18116121134117");
 }
 
 const TEST_EXAMPLE: &'static str = "inp w
